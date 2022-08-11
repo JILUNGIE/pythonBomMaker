@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 from openpyxl import Workbook
 
 month = {'January': '01', 'February': '02', 'March': '03', 'April': '04', 'May': '05', 'June': '06',
@@ -11,34 +12,37 @@ def fileExplorer():  # https://stackoverflow.com/questions/9319317/quick-and-eas
     root = tk.Tk()
     root.withdraw()
     # https://www.pythontutorial.net/tkinter/tkinter-open-file-dialog/
-    return filedialog.askopenfilename(title='Select bom file', filetypes=filetypes)
+    files = filedialog.askopenfilename(title='Select bom file', filetypes=filetypes)
 
+    if files == '':
+        messagebox.showwarning("Warning!!", "Please select a file")
+    return files
 
-def fileNameMaker():
-    bomContents = bomFileLines.split()
+def fileName(title):
+    bomContents = title.split()
 
     bomTitle = bomContents[0]
     bomYear = bomContents[5]
     bomMonth = month[bomContents[3]]
     bomDate = bomContents[4].replace(',', '')
 
-    bomBirthDay = bomYear+'.'+bomMonth+'.'+bomDate
-    return bomTitle, bomBirthDay
+    bomBirthDay = "%s(%s.%s.%s)"%(bomTitle, bomYear, bomMonth, bomDate)
+
+    return bomBirthDay
 
 
 if __name__ == "__main__":
-    wb = Workbook()
-    ws = wb.active
-    try:
-        bomFile = open(fileExplorer(), 'r')
-        bomFileLines = bomFile.readline()
-        bomFile.close()
-    except:
-        raise Exception("Select File.")
 
-    fileTitle, fileDate = fileNameMaker()
-    bomTitle = fileTitle+"("+fileDate+")"
+    bomFile = open(fileExplorer(), 'r')
+    bomFileIntroLines = bomFile.readlines()[0]
+    
+    print(bomFileIntroLines)
+    bomtitle = "%s.xlsx"%(fileName(bomFileIntroLines))
+    bomFile.close()
 
-    ws.title = "BOM"  # sheet 의 이름 변경
-    wb.save(bomTitle+".xlsx")
-    wb.close()
+    # wb = Workbook()
+    # ws = wb.active
+
+    # ws.title = "BOM"  # sheet 의 이름 변경
+    # wb.save(bomtitle)
+    # wb.close()
